@@ -1,13 +1,10 @@
 import axios from 'axios'
 
-// Axios instance configured for the backend API
-// Set NEXT_PUBLIC_API_BASE in .env.local, e.g. http://localhost:8000
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000',
   headers: { 'Content-Type': 'application/json' },
 })
 
-// Debug: log requests/responses in browser console to verify traffic
 api.interceptors.request.use((config) => {
   try {
     // eslint-disable-next-line no-console

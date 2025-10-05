@@ -1,4 +1,3 @@
-// src/stores/pollutionStore.ts
 import { create } from 'zustand'
 import axios from 'axios'
 
@@ -36,7 +35,6 @@ export const usePollutionStore = create<PollutionState>(set => ({
   fetchCurrentPollution: async () => {
     set({ isLoading: true, error: null })
     try {
-      // Получаем геопозицию пользователя
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         if (!navigator.geolocation) reject(new Error('Geolocation not supported'))
         navigator.geolocation.getCurrentPosition(resolve, reject)
@@ -44,7 +42,6 @@ export const usePollutionStore = create<PollutionState>(set => ({
 
       const { latitude, longitude } = position.coords
 
-      // Отправляем GET на backend /api/location/current
       const response = await axios.get('/api/location/current', {
         params: { lat: latitude, lon: longitude },
       })
@@ -53,7 +50,6 @@ export const usePollutionStore = create<PollutionState>(set => ({
 
       set({ location: { city, country, lat, lon } })
 
-      // Запрашиваем данные о текущем загрязнении
       const pollutionResp = await axios.get('/api/pollution/current/location', {
         params: { lat, lon },
       })

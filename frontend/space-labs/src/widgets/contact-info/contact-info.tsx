@@ -98,7 +98,7 @@ export function ContactInfo() {
 					</h3>
 					<div className='flex gap-4'>
 						<a
-							href='https://github.com/f1rdavsi/SpaceLabs'
+							href='https://github.com/f1rdavsi/nasa-project.git'
 							className='w-10 h-10 rounded-full bg-blue-900/20 flex items-center justify-center hover:bg-blue-400 hover:text-white transition-all'
 						>
 							<Github className='w-5 h-5' />

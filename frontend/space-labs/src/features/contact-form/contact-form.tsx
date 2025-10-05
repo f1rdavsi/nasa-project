@@ -71,7 +71,7 @@ export function ContactForm() {
 		setIsSubmitting(true)
 
 		try {
-			// Здесь ты можешь вставить настоящий fetch-запрос
+			
 			await new Promise(resolve => setTimeout(resolve, 1000))
 			toast.success("Message sent successfully! We'll get back to you soon.")
 			setFormData({ name: '', email: '', subject: '', message: '' })

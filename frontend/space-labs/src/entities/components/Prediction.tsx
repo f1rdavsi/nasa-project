@@ -1,10 +1,10 @@
 'use client'
 
+import { usePollutionStore } from '@/shared/lib/store'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import gsap from 'gsap'
 import { Calendar, Download, Globe, MapPin } from 'lucide-react'
-import { usePollutionStore } from '@/shared/lib/store'
 import { useEffect, useRef, useState } from 'react'
 import {
 	Area,
@@ -37,8 +37,6 @@ const COUNTRIES = [
 	{ code: 'KZ', name: 'Kazakhstan' },
 	{ code: 'UZ', name: 'Uzbekistan' },
 ]
-
-// удалены мок-данные; используем бэкенд через Zustand
 
 const TableSkeleton = () => (
 	<div className='space-y-3 animate-pulse'>
@@ -81,9 +79,16 @@ export default function Prediction() {
 	const [isAutoDetected, setIsAutoDetected] = useState(true)
 	const [startDate, setStartDate] = useState('')
 	const [endDate, setEndDate] = useState('')
-    const { measurements: pollutionData, loading: isLoading, setRange, setCountry, detectLocation, loadHistory, loadPrediction } = usePollutionStore()
+	const {
+		measurements: pollutionData,
+		loading: isLoading,
+		setRange,
+		setCountry,
+		detectLocation,
+		loadHistory,
+		loadPrediction,
+	} = usePollutionStore()
 
-	// Pagination
 	const [currentPage, setCurrentPage] = useState(1)
 	const itemsPerPage = 15
 	const totalPages = Math.ceil(pollutionData.length / itemsPerPage)
@@ -104,11 +109,14 @@ export default function Prediction() {
 
 		setStartDate(thirtyDaysAgo.toISOString().split('T')[0])
 		setEndDate(today.toISOString().split('T')[0])
-        setRange(thirtyDaysAgo.toISOString().split('T')[0], today.toISOString().split('T')[0])
-        detectLocation().then(() => {
-            loadHistory()
-            loadPrediction()
-        })
+		setRange(
+			thirtyDaysAgo.toISOString().split('T')[0],
+			today.toISOString().split('T')[0]
+		)
+		detectLocation().then(() => {
+			loadHistory()
+			loadPrediction()
+		})
 	}, [])
 
 	useEffect(() => {
@@ -164,20 +172,20 @@ export default function Prediction() {
 
 	const handleFilter = () => {
 		if (!startDate || !endDate) return
-        setRange(startDate, endDate)
-        setCurrentPage(1)
-        loadHistory()
-        loadPrediction()
+		setRange(startDate, endDate)
+		setCurrentPage(1)
+		loadHistory()
+		loadPrediction()
 	}
 
 	const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const c = e.target.value
-        setSelectedCountry(c)
-        setIsAutoDetected(false)
-        setCountry(c)
-        setCurrentPage(1)
-        loadHistory()
-        loadPrediction()
+		const c = e.target.value
+		setSelectedCountry(c)
+		setIsAutoDetected(false)
+		setCountry(c)
+		setCurrentPage(1)
+		loadHistory()
+		loadPrediction()
 	}
 
 	const downloadCSV = () => {
@@ -198,11 +206,6 @@ export default function Prediction() {
 		window.URL.revokeObjectURL(url)
 	}
 
-	// -----------------------------
-	// TODO: Для графиков AQI/PM2.5/PM10:
-	// Можно использовать GET /pollution/predict?country=...&start=...&end=...
-	// и обновлять pollutionData
-	// -----------------------------
 	const getAQIColor = (aqi: number) => {
 		if (aqi <= 50) return 'text-green-400'
 		if (aqi <= 100) return 'text-yellow-400'
@@ -237,8 +240,6 @@ export default function Prediction() {
 			color: 'bg-purple-500/20 text-purple-400 border-purple-500/50',
 		}
 	}
-
-	// TODO: здесь return() с JSX без изменений
 
 	return (
 		<div className='container mx-auto px-4 py-12 space-y-8'>

@@ -37,8 +37,6 @@ const COUNTRIES = [
 	{ code: 'UZ', name: 'Uzbekistan' },
 ]
 
-// удалены мок-данные; используем бэкенд через Zustand
-
 const TableSkeleton = () => (
 	<div className='space-y-3 animate-pulse'>
 		{[...Array(5)].map((_, i) => (
@@ -193,11 +191,6 @@ export default function Historical() {
 		window.URL.revokeObjectURL(url)
 	}
 
-	// -----------------------------
-	// TODO: Для графиков AQI/PM2.5/PM10:
-	// Можно использовать GET /pollution/predict?country=...&start=...&end=...
-	// и обновлять pollutionData
-	// -----------------------------
 	const getAQIColor = (aqi: number) => {
 		if (aqi <= 50) return 'text-green-400'
 		if (aqi <= 100) return 'text-yellow-400'
@@ -232,8 +225,6 @@ export default function Historical() {
 			color: 'bg-purple-500/20 text-purple-400 border-purple-500/50',
 		}
 	}
-
-	// TODO: здесь return() с JSX без изменений
 
 	return (
 		<div className='container mx-auto px-4 py-12 space-y-8'>
