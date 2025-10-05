@@ -1,18 +1,18 @@
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE || 'https://spacelabs-api.sr44.ru',
   headers: { 'Content-Type': 'application/json' },
 })
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(config => {
   try {
     // eslint-disable-next-line no-console
     console.log('[API →]', config.method?.toUpperCase(), `${config.baseURL}${config.url}`, config.params || config.data)
   } catch {}
   return config
 })
-api.interceptors.response.use((response) => {
+api.interceptors.response.use(response => {
   try {
     // eslint-disable-next-line no-console
     console.log('[API ←]', response.status, response.config.url, response.data)
@@ -44,11 +44,7 @@ export const fetchCurrentLocation = async () => {
   return data as { city?: string; country?: string; lat: number; lon: number }
 }
 
-export const fetchCurrentPollutionByCoords = async (params: {
-  lat: number
-  lon: number
-  radius_m?: number
-}) => {
+export const fetchCurrentPollutionByCoords = async (params: { lat: number; lon: number; radius_m?: number }) => {
   const { data } = await api.get('/api/pollution/current/location', { params })
   return data as {
     location: { lat: number; lon: number; radius_m: number }
@@ -96,5 +92,3 @@ export const fetchPrediction = async (params: {
     meta: any
   }
 }
-
-
