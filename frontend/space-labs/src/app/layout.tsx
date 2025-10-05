@@ -1,3 +1,4 @@
+'use client'
 import { exo2, orbitron, rajdhani } from '@/shared/lib/fonts/fontspace'
 import { RouterLoader } from '@/shared/ui/RouterLoader'
 import type { Metadata } from 'next'
