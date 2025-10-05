@@ -16,9 +16,10 @@ router = APIRouter(prefix="/api/location", tags=["location"])
 async def get_current_location(request: Request):
     # Берём реальный IP из заголовков, если есть, иначе fallback на request.client.host
     client_ip = (
-        request.headers.get("X-Real-IP") or
-        request.headers.get("X-Forwarded-For") or
-        request.client.host
+            request.headers.get("CF-Connecting-IP") or
+            request.headers.get("X-Real-IP") or
+            request.headers.get("X-Forwarded-For") or
+            request.client.host
     )
 
     # Игнорируем локальный IP Docker
