@@ -6,24 +6,21 @@ import { CurrentPollutionSection } from '@/widgets/CurrentPollution/CurrentPollu
 import Footer from '@/widgets/footer/footer'
 import Header from '@/widgets/header/header'
 import dynamic from 'next/dynamic'
-
-const EarthPollutionScene = dynamic(
-	() => import('@/shared/config/EarthScene'),
-	{
-		ssr: false,
-		loading: () => <EarthLoader />,
-	}
-)
+import { Suspense } from "react";
+const EarthPollutionScene = dynamic(() => import('@/shared/config/EarthScene'), {
+  ssr: false,
+  loading: () => <EarthLoader />,
+})
 
 export default function Home() {
-	return (
-		<>
-			<Header />
-			<EarthPollutionScene />
-			<CurrentPollutionSection />
-			<AirPollution />
-			<Accordion />
-			<Footer />
-		</>
-	)
+  return (
+    <Suspense fallback={null}>
+      <Header />
+      <EarthPollutionScene />
+      <CurrentPollutionSection />
+      <AirPollution />
+      <Accordion />
+      <Footer />
+    </Suspense>
+  )
 }
