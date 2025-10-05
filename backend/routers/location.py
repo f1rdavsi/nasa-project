@@ -13,79 +13,38 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/location", tags=["location"])
 
 @router.get("/current", response_model=CurrentLocationResponse)
-async def get_current_location(
-    request: Request,
-    x_forwarded_for: Optional[str] = None,
-    x_real_ip: Optional[str] = None
-):
-    """
-    Detect user's current location from IP address or geolocation headers.
-    
-    This endpoint attempts to determine the user's location using:
-    1. Geolocation headers (if provided by frontend)
-    2. IP geolocation (if IP is provided)
-    3. Fallback to a default location
-    
-    Args:
-        request: FastAPI request object
-        x_forwarded_for: X-Forwarded-For header (optional)
-        x_real_ip: X-Real-IP header (optional)
-        
-    Returns:
-        CurrentLocationResponse with detected location information
-    """
-    try:
-        # Try to get location from geolocation headers first
-        lat_header = request.headers.get("X-Geolocation-Lat")
-        lon_header = request.headers.get("X-Geolocation-Lon")
-        
-        if lat_header and lon_header:
-            try:
-                lat = float(lat_header)
-                lon = float(lon_header)
-                
-                # Validate coordinates
-                if -90 <= lat <= 90 and -180 <= lon <= 180:
-                    return CurrentLocationResponse(
-                        city="Detected",
-                        country="Unknown",
-                        lat=lat,
-                        lon=lon,
-                        detected_from="geolocation"
-                    )
-            except ValueError:
-                logger.warning("Invalid geolocation headers provided")
-        
-        # Try IP-based geolocation
-        client_ip = x_real_ip or x_forwarded_for or request.client.host
-        
-        if client_ip and client_ip != "127.0.0.1":
-            location = await _get_location_from_ip(client_ip)
-            if location:
-                return CurrentLocationResponse(
-                    city=location.get("city", "Unknown"),
-                    country=location.get("country", "Unknown"),
-                    lat=location.get("lat", 0.0),
-                    lon=location.get("lon", 0.0),
-                    detected_from="ip"
-                )
-        
-        # Fallback to default location (Dushanbe, Tajikistan)
-        logger.info("Using fallback location: Dushanbe, Tajikistan")
-        return CurrentLocationResponse(
-            city="Dushanbe",
-            country="Tajikistan",
-            lat=38.5358,
-            lon=68.7791,
-            detected_from="fallback"
-        )
-        
-    except Exception as e:
-        logger.error(f"Error detecting current location: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to detect current location"
-        )
+async def get_current_location(request: Request):
+    # Берём реальный IP из заголовков, если есть, иначе fallback на request.client.host
+    client_ip = (
+        request.headers.get("X-Real-IP") or
+        request.headers.get("X-Forwarded-For") or
+        request.client.host
+    )
+
+    # Игнорируем локальный IP Docker
+    if client_ip in ("127.0.0.1", "172.18.0.1"):
+        client_ip = None
+
+    # Если есть IP, пробуем геолокацию по IP
+    if client_ip:
+        location = await _get_location_from_ip(client_ip)
+        if location:
+            return CurrentLocationResponse(
+                city=location.get("city", "Unknown"),
+                country=location.get("country", "Unknown"),
+                lat=location.get("lat", 0.0),
+                lon=location.get("lon", 0.0),
+                detected_from="ip"
+            )
+
+    # Фолбэк на координаты Душанбe
+    return CurrentLocationResponse(
+        city="Dushanbe",
+        country="Tajikistan",
+        lat=38.5358,
+        lon=68.7791,
+        detected_from="fallback"
+    )
 
 @router.post("/select", response_model=LocationResponse)
 async def select_location(location_request: LocationRequest):
