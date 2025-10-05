@@ -6,10 +6,10 @@ import { ContactInfo } from '@/widgets/contact-info/contact-info'
 import Footer from '@/widgets/footer/footer'
 import Header from '@/widgets/header/header'
 import { ParallaxHero } from '@/widgets/parallax-hero/parallax-hero'
-import { Suspense } from 'react'
+
 export default function ContactsPage() {
   return (
-    <Suspense fallback={null}>
+    <>
       <Header />
       <ParallaxHero
         title="Get in Touch"
@@ -37,6 +37,6 @@ export default function ContactsPage() {
 
       <ContactMessage />
       <Footer />
-    </Suspense>
+    </>
   )
 }
