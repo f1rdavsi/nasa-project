@@ -67,16 +67,38 @@ export function CurrentPollutionCard() {
 				setIsLoading(true)
 				setError(null)
 
-				const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-					if (!navigator.geolocation) {
-						reject(new Error('Geolocation is not supported'))
-						return
-					}
-					navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000 })
-				})
+				let lat: number | null = null
+				let lon: number | null = null
 
-				const lat = position.coords.latitude
-				const lon = position.coords.longitude
+				// Try browser geolocation first
+				try {
+					const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+						if (!navigator.geolocation) {
+							reject(new Error('Geolocation is not supported'))
+							return
+						}
+						navigator.geolocation.getCurrentPosition(
+							resolve,
+							reject,
+							{ enableHighAccuracy: true, timeout: 8000, maximumAge: 60_000 }
+						)
+					})
+					lat = position.coords.latitude
+					lon = position.coords.longitude
+				} catch (geoErr: any) {
+					// Geolocation failed (timeout/denied/unavailable). Fall back to server-side location via IP.
+					try {
+						const { fetchCurrentLocation } = await import('@/shared/lib/api')
+						const loc = await fetchCurrentLocation()
+						lat = loc.lat
+						lon = loc.lon
+					} catch (fallbackErr) {
+						console.error('Failed to resolve location via IP fallback:', fallbackErr)
+						throw geoErr
+					}
+				}
+
+				if (lat == null || lon == null) throw new Error('Unable to determine location')
 				setCoords({ lat, lon })
 
 				const res = await fetchCurrentPollutionByCoords({ lat, lon, radius_m: 10000 })
@@ -87,9 +109,24 @@ export function CurrentPollutionCard() {
 					if (typeof m.value === 'number') byParam[key] = m.value
 				}
 				setPollutants(byParam)
-			} catch (err) {
+			} catch (err: any) {
 				console.error('Error fetching pollution data:', err)
-				setError('Failed to load pollution data')
+				const message = err?.message || 'Failed to load pollution data'
+				// Provide more user-friendly messages for common geolocation issues
+				if (typeof navigator !== 'undefined' && 'geolocation' in navigator && err?.code) {
+					const code = err.code
+					if (code === 1) {
+						setError('Location permission denied. Please allow location access or try again later.')
+					} else if (code === 2) {
+						setError('Location is currently unavailable. Using approximate location may help.')
+					} else if (code === 3) {
+						setError('Getting your location took too long. We tried a fallback, please retry if it persists.')
+					} else {
+						setError(message)
+					}
+				} else {
+					setError(message)
+				}
 			} finally {
 				setIsLoading(false)
 			}
