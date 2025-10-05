@@ -28,7 +28,7 @@ export type HistoricalRow = {
   o3?: number
   so2?: number
   co?: number
-  aqi?: number
+  aqi: number
   aqi_category?: string
 }
 
