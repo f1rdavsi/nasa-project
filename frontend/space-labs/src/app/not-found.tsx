@@ -1,3 +1,4 @@
+'use client'
 import NotFound from '@/entities/components/NotFound'
 import React from 'react'
 
