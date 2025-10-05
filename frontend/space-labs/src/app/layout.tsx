@@ -3,6 +3,7 @@ import { exo2, orbitron, rajdhani } from '@/shared/lib/fonts/fontspace'
 import { RouterLoader } from '@/shared/ui/RouterLoader'
 import type { Metadata } from 'next'
 import './globals.css'
+import { Suspense } from 'react'
 
 export default function RootLayout({
   children,
@@ -15,7 +16,9 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body>
-        <RouterLoader />
+        <Suspense fallback={null}>
+          <RouterLoader />
+        </Suspense>
         {children}
       </body>
     </html>
