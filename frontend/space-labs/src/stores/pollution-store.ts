@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import axios from 'axios'
+import { api } from '@/shared/lib/api'
 
 interface Location {
   city?: string
@@ -42,7 +42,7 @@ export const usePollutionStore = create<PollutionState>(set => ({
 
       const { latitude, longitude } = position.coords
 
-      const response = await axios.get('/api/location/current', {
+      const response = await api.get('/api/location/current', {
         params: { lat: latitude, lon: longitude },
       })
 
@@ -50,7 +50,7 @@ export const usePollutionStore = create<PollutionState>(set => ({
 
       set({ location: { city, country, lat, lon } })
 
-      const pollutionResp = await axios.get('/api/pollution/current/location', {
+      const pollutionResp = await api.get('/api/pollution/current/location', {
         params: { lat, lon },
       })
 

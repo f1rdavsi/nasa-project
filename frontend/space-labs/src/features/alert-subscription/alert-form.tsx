@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { Bell, Send } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { api } from '@/shared/lib/api'
 
 function Card3D({ children }: { children: React.ReactNode }) {
   const cardRef = useRef<HTMLDivElement>(null)
@@ -54,13 +55,8 @@ export function AlertForm() {
     setIsSubmitting(true)
 
     try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ telegramId: id }),
-      })
-
-      if (!res.ok) throw new Error('Failed to subscribe')
+      // Send via shared axios instance which uses baseURL and interceptors
+      await api.post('/api/subscribe', { telegramId: id })
 
       toast.success('Successfully subscribed to air quality alerts!')
       setTelegramId('')
